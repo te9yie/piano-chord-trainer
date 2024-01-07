@@ -1,20 +1,28 @@
 import { useRef, useEffect } from "react";
+import "./Keyboard.css";
 
 const CHORDS = new Map([
   ["C", [0 % 12, 4 % 12, 7 % 12]],
   ["Cm", [0 % 12, 3 % 12, 7 % 12]],
+  ["Cdim", [0 % 12, 3 % 12, 6 % 12]],
   ["D", [2 % 12, 6 % 12, 9 % 12]],
   ["Dm", [2 % 12, 5 % 12, 9 % 12]],
+  ["Ddim", [2 % 12, 5 % 12, 8 % 12]],
   ["E", [4 % 12, 8 % 12, 11 % 12]],
   ["Em", [4 % 12, 7 % 12, 11 % 12]],
+  ["Edim", [4 % 12, 7 % 12, 10 % 12]],
   ["F", [5 % 12, 9 % 12, 12 % 12]],
   ["Fm", [5 % 12, 8 % 12, 12 % 12]],
+  ["Fdim", [5 % 12, 8 % 12, 11 % 12]],
   ["G", [7 % 12, 11 % 12, 14 % 12]],
   ["Gm", [7 % 12, 10 % 12, 14 % 12]],
+  ["Gdim", [7 % 12, 10 % 12, 13 % 12]],
   ["A", [9 % 12, 13 % 12, 16 % 12]],
   ["Am", [9 % 12, 12 % 12, 16 % 12]],
+  ["Adim", [9 % 12, 12 % 12, 15 % 12]],
   ["B", [11 % 12, 15 % 12, 18 % 12]],
   ["Bm", [11 % 12, 14 % 12, 18 % 12]],
+  ["Bdim", [11 % 12, 14 % 12, 17 % 12]],
 ]);
 
 const Keyboard = ({ chord = "" }) => {
@@ -23,8 +31,9 @@ const Keyboard = ({ chord = "" }) => {
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
-    const w = canvas.width;
-    const h = canvas.height;
+    const { clientWidth: w, clientHeight: h } = canvas;
+    canvas.width = w;
+    canvas.height = h;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -42,7 +51,8 @@ const Keyboard = ({ chord = "" }) => {
       const active = pushed ? pushed.includes(white_n[n]) : false;
       ctx.fillStyle = active ? "#ff0" : "#fff";
       ctx.strokeStyle = "#000";
-      ctx.fillRect(i * kw, 0, kw - 2, h);
+      ctx.fillRect(i * kw, 0, kw, h);
+      ctx.strokeRect(i * kw, 0, kw, h);
     }
     for (let i = 0; i < octave * 2; ++i) {
       const n = i % octave;
@@ -50,12 +60,13 @@ const Keyboard = ({ chord = "" }) => {
       if (sharps.includes(i % octave)) {
         ctx.fillStyle = active ? "#ff0" : "#000";
         ctx.strokeStyle = "#000";
-        ctx.fillRect(i * kw + (kw * 2) / 3, 0, (kw * 2) / 3 - 2, (h * 3) / 5);
+        ctx.fillRect(i * kw + (kw * 2) / 3, 0, (kw * 2) / 3, (h * 3) / 5);
+        ctx.strokeRect(i * kw + (kw * 2) / 3, 0, (kw * 2) / 3, (h * 3) / 5);
       }
     }
-  }, []);
+  });
 
-  return <canvas ref={canvasRef}></canvas>;
+  return <canvas ref={canvasRef} id="canvas"></canvas>;
 };
 
 export default Keyboard;
