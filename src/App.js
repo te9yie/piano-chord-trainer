@@ -1,6 +1,6 @@
 import "./App.css";
 import Keyboard from "./Keyboard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const TYPE_MAJOR = 1;
 const TYPE_MINOR = 2;
@@ -36,15 +36,35 @@ function App() {
   const [mode, setMode] = useState(0);
   const [choiceChord, setChoiceChord] = useState("");
   const [randomChord, setRandomChord] = useState("");
+  const [frame, setFrame] = useState(0);
+  const [isShowKeyboard, setShowKeyboard] = useState(true);
   const [isFilterMajor, setFilterMajor] = useState(true);
   const [isFilterMinor, setFilterMinor] = useState(true);
   const [isFilterDim, setFilterDim] = useState(false);
+  const [isAutoRandom, setAutoRandom] = useState(false);
+  const [autoPlaySec, setAutoPlaySec] = useState(5);
 
   const random_chords = [...CHORDS]
     .filter(([_, value]) => (isFilterMajor ? true : value.type !== TYPE_MAJOR))
     .filter(([_, value]) => (isFilterMinor ? true : value.type !== TYPE_MINOR))
     .filter(([_, value]) => (isFilterDim ? true : value.type !== TYPE_DIM))
     .map(([key, _]) => key);
+
+  const changeRandromChord = () => {
+    setRandomChord(
+      random_chords[Math.floor(Math.random() * random_chords.length)]
+    );
+  };
+
+  useEffect(() => {
+    if (mode === "random" && isAutoRandom) {
+      const timer = setTimeout(() => {
+        changeRandromChord();
+        setFrame(frame + 1);
+      }, 1000 * Math.max(autoPlaySec, 1));
+      return () => clearTimeout(timer);
+    }
+  }, [isAutoRandom, frame, autoPlaySec]);
 
   const ChoiceChordList = () => (
     <select
@@ -61,20 +81,26 @@ function App() {
   );
 
   const RandomButton = () => (
-    <button
-      onClick={(e) =>
-        setRandomChord(
-          random_chords[Math.floor(Math.random() * random_chords.length)]
-        )
-      }
-    >
-      ランダム
-    </button>
+    <button onClick={(e) => changeRandromChord()}>ランダム</button>
   );
 
   const RandomProps = () => (
     <>
       <RandomButton />
+      <p>
+        <input
+          type="checkbox"
+          checked={isAutoRandom}
+          onChange={(e) => setAutoRandom(e.target.checked)}
+        />
+        自動プレイ
+        <input
+          type="number"
+          value={autoPlaySec}
+          min={1}
+          onChange={(e) => setAutoPlaySec(e.target.value)}
+        />
+      </p>
       <p>
         <input
           type="checkbox"
@@ -105,6 +131,14 @@ function App() {
     <div className="App">
       <div>
         <div>
+          <p>
+            <input
+              type="checkbox"
+              checked={isShowKeyboard}
+              onChange={(e) => setShowKeyboard(e.target.checked)}
+            />
+            キーボード表示
+          </p>
           <select
             name="mode"
             value={mode}
@@ -124,9 +158,7 @@ function App() {
         )}
       </div>
       <div id="chord">{chord_str}</div>
-      <div>
-        <Keyboard chord={chord_str} />
-      </div>
+      <div>{isShowKeyboard ? <Keyboard chord={chord_str} /> : <></>}</div>
     </div>
   );
 }
