@@ -103,10 +103,6 @@ function App() {
 
   return (
     <div className="App">
-      <div id="chord">{chord_str}</div>
-      <div>
-        <Keyboard chord={chord_str} />
-      </div>
       <div>
         <div>
           <select
@@ -126,6 +122,10 @@ function App() {
         ) : (
           <></>
         )}
+      </div>
+      <div id="chord">{chord_str}</div>
+      <div>
+        <Keyboard chord={chord_str} />
       </div>
     </div>
   );

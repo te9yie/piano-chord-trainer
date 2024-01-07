@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import "./Keyboard.css";
 
 const CHORDS = new Map([
@@ -25,13 +25,33 @@ const CHORDS = new Map([
   ["Bdim", [11 % 12, 14 % 12, 17 % 12]],
 ]);
 
+const useWindowSize = () => {
+  const [size, setSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return size;
+};
+
 const Keyboard = ({ chord = "" }) => {
   const canvasRef = useRef(null);
+  const { width, height } = useWindowSize();
 
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
-    const { clientWidth: w, clientHeight: h } = canvas;
+    const w = Math.min(width, height) * 0.8;
+    const h = w * 0.5;
     canvas.width = w;
     canvas.height = h;
     const ctx = canvas.getContext("2d");
